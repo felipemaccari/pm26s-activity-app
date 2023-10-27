@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "996467033726",
+    "project_id": "pm26s-activity-app",
+    "storage_bucket": "pm26s-activity-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:996467033726:android:b4f80c3d9fd1e3849efa2f",
+        "android_client_info": {
+          "package_name": "com.example.pm26sactivityapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "996467033726-m9kits9j5mr62o7duqupq98kpl67lloc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.pm26sactivityapp",
+            "certificate_hash": "bd57e4c80c42aaaf9e4de13c8e8df9283583f4bc"
+          }
+        },
+        {
+          "client_id": "996467033726-am4ild7ujmkosej293k8mb3q3mu32m76.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCRRbgoDvTG9D8op6xAz3KETdS-2gCJukw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "996467033726-am4ild7ujmkosej293k8mb3q3mu32m76.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
