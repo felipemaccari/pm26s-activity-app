@@ -1,10 +1,13 @@
 package com.example.pm26sactivityapp
+import android.R.bool
 import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.SignInClient
@@ -12,6 +15,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.firestore
 
 class MainActivity : AppCompatActivity() {
     private lateinit var btnGoogleLogin: Button
@@ -21,9 +25,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var signInRequest: BeginSignInRequest
     private lateinit var auth: FirebaseAuth
 
+    private val db = Firebase.firestore
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val db = Firebase.firestore
 
         tvEmail = findViewById(R.id.tvEmail)
         btnGoogleLogin = findViewById(R.id.btnGoogleLogin)
@@ -83,9 +91,10 @@ class MainActivity : AppCompatActivity() {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d("LOGIN", "signInWithCredential:success")
                             val user = auth.currentUser
-                            println(user?.email)
-                            tvEmail.text = user?.email
-                            //updateUI(user)
+
+                            if(user != null){
+                                listUserFromDatabase(user.displayName, user.email, user.photoUrl)
+                            }
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w("LOGIN", "signInWithCredential:failure", task.exception)
@@ -98,5 +107,46 @@ class MainActivity : AppCompatActivity() {
                 Log.d("LOGIN", "No ID token!")
             }
         }
+    }
+
+    private fun listUserFromDatabase(username: String?, userEmail: String?, userPhotoURL: Uri?) {
+        db.collection("users")
+            .whereEqualTo("userEmail", userEmail)
+            .get()
+            .addOnSuccessListener { result ->
+                if(result.isEmpty && username != null && userEmail != null){
+                    registerUserOnDatabase(username, userEmail, userPhotoURL)
+                } else {
+                    openIntentMainActivity()
+                    Toast.makeText(this, "Login realizado com sucesso", Toast.LENGTH_LONG).show()
+                }
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Erro na listagem", Toast.LENGTH_LONG).show()
+                Log.w("#USER_LIST", "Error getting documents. ", e)
+            }
+    }
+
+    private fun registerUserOnDatabase(username: String, userEmail: String, userPhotoURL: Uri?) {
+        val registro = hashMapOf(
+            "username" to username,
+            "userEmail" to userEmail,
+            "userPhotoURL" to userPhotoURL
+        )
+
+        db.collection("users")
+            .add(registro)
+            .addOnSuccessListener { documentReference ->
+                Toast.makeText(this, "Usuário criado com sucesso", Toast.LENGTH_LONG).show()
+                openIntentMainActivity()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Ocorreu um erro, veja nos logs", Toast.LENGTH_LONG).show()
+                Log.w("#USER_INCLUDE", "Error adding document", e)
+            }
+    }
+
+    private fun openIntentMainActivity(){
+        startActivity(Intent(this, MainMenuActivity::class.java).apply {})
     }
 }
