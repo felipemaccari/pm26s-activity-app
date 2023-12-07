@@ -114,17 +114,20 @@ class CaptureMotion  : AppCompatActivity() {
 
         var groupMotions = 0
         var groupAveragaeMotions = 0.0
+        var groupTotal = 0.0
 
         groupDatabase.get()
             .addOnSuccessListener { document ->
                     val group = document.toObject(Group::class.java)
                      if (group != null) {
                          groupMotions = group.motions + 1
-                         groupAveragaeMotions = group.averagaeMotions.toDouble()
+                         groupTotal = group.total.toDouble()
 
                          if (total != null) {
+                             groupTotal += total.toDouble()
+
                              groupAveragaeMotions =
-                                 (groupAveragaeMotions + total.toDouble()) / groupMotions
+                                 groupTotal / groupMotions
                          }
 
 
@@ -133,7 +136,8 @@ class CaptureMotion  : AppCompatActivity() {
                                  "motions",
                                  groupMotions,
                                  "averagaeMotions",
-                                 groupAveragaeMotions
+                                 groupAveragaeMotions,
+                                 "total", groupTotal
                              )
                                  .addOnSuccessListener {
                                  }
