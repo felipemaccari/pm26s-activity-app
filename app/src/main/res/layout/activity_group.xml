@@ -32,7 +32,7 @@
         android:layout_height="wrap_content"
         android:onClick="btRegisterActivity"
         android:visibility="invisible"
-        android:text="Adicionar Atividade"
+        android:text="Iniciar Atividade"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"

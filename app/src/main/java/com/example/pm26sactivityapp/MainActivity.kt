@@ -66,13 +66,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun tratarLogin(){
-        oneTapClient.beginSignIn(signInRequest)
-            .addOnSuccessListener (this) { result ->
-                startIntentSenderForResult(result.pendingIntent.intentSender, 2, null, 0,0,0,null)
-            }
-            .addOnFailureListener(this) {e ->
-                Log.d("LOGIN", e.localizedMessage)
-            }
+        /**
+         * oneTapClient.beginSignIn(signInRequest)
+         *             .addOnSuccessListener (this) { result ->
+         *                 startIntentSenderForResult(result.pendingIntent.intentSender, 2, null, 0,0,0,null)
+         *             }
+         *             .addOnFailureListener(this) {e ->
+         *                 Log.d("LOGIN", e.localizedMessage)
+         *             }
+         */
+        val urlString = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fpt.vecteezy.com%2Ffoto%2F23186830-retrato-do-uma-lobo-dentro-perfil-em-uma-sombrio-fundo-digital-pintura-ai-generativo-imagem&psig=AOvVaw29YgX9GGptvDJDaqan8Rax&ust=1701470128036000&source=images&cd=vfe&ved=0CBEQjRxqFwoTCLix1Kfk7IIDFQAAAAAdAAAAABAE"
+        val uri = Uri.parse(urlString)
+
+        listUserFromDatabase("Keslley Capelin", "capelin.cvv@gmail.com", uri)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

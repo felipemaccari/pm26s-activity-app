@@ -1,15 +1,21 @@
 package com.example.pm26sactivityapp
 
 import android.content.Context
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.opengl.Visibility
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.Toast
 import androidx.constraintlayout.widget.Group
 import com.example.pm26sactivityapp.databinding.ActivityGroupBinding
 import com.example.pm26sactivityapp.databinding.ActivityListGoupBinding
+import com.example.pm26sactivityapp.services.CaptureMotion
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -21,6 +27,11 @@ class GroupActivity : AppCompatActivity() {
     private lateinit var group: Group
     private val db = Firebase.firestore
     private var groupName = ""
+    private lateinit var sensorManager: SensorManager
+    private lateinit var accelerometer: Sensor
+    private var isCapturing: Boolean = false
+    private var captureMotion: CaptureMotion = CaptureMotion()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,12 +45,28 @@ class GroupActivity : AppCompatActivity() {
 
         auth = Firebase.auth
 
+        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)!!
+
+
         binding.btAddParticipant.setOnClickListener {
             btOnClick()
         }
-
         userLoggedIsGroupParticipant()
+
+        binding.btRegisterActivity.setOnClickListener{
+            if(isCapturing){
+                isCapturing = captureMotion.stopCapture(sensorManager, this)
+            } else {
+                try{
+                    isCapturing = captureMotion.startCapture(sensorManager,accelerometer,this)
+                }catch (e: Exception){
+                    println(e.message)
+                }
+            }
+        }
     }
+
 
     fun btOnClick() {
         val docRef = db.collection("users").document(userLogged())
@@ -81,6 +108,7 @@ class GroupActivity : AppCompatActivity() {
                     if(isGroupMember){
                         binding.btAddParticipant.visibility = View.INVISIBLE
                         binding.btRegisterActivity.visibility = View.VISIBLE
+
                     }
                 }
             }
