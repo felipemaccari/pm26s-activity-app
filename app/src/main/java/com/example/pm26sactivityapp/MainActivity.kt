@@ -66,9 +66,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun tratarLogin(){
-        /**
-         *
-         */
         oneTapClient.beginSignIn(signInRequest)
                      .addOnSuccessListener (this) { result ->
                              startIntentSenderForResult(result.pendingIntent.intentSender, 2, null, 0,0,0,null)
