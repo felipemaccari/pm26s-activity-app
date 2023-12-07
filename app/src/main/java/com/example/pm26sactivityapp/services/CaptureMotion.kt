@@ -9,6 +9,7 @@ import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import com.example.pm26sactivityapp.entities.Group
 import com.google.firebase.firestore.FirebaseFirestore
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -109,6 +110,46 @@ class CaptureMotion  : AppCompatActivity() {
                 Toast.makeText(_context, "Falha ao salvar dados ${e.message}", Toast.LENGTH_SHORT).show()
             }
 
+        val groupDatabase = db.collection("Group").document(groupName.toString())
+
+        var groupMotions = 0
+        var groupAveragaeMotions = 0.0
+        var groupTotal = 0.0
+
+        groupDatabase.get()
+            .addOnSuccessListener { document ->
+                    val group = document.toObject(Group::class.java)
+                     if (group != null) {
+                         groupMotions = group.motions + 1
+                         groupTotal = group.total.toDouble()
+
+                         if (total != null) {
+                             groupTotal += total.toDouble()
+
+                             groupAveragaeMotions =
+                                 groupTotal / groupMotions
+                         }
+
+
+                         if (groupDatabase != null) {
+                             groupDatabase.update(
+                                 "motions",
+                                 groupMotions,
+                                 "averagaeMotions",
+                                 groupAveragaeMotions,
+                                 "total", groupTotal
+                             )
+                                 .addOnSuccessListener {
+                                 }
+                                 .addOnFailureListener {
+                                 }
+                         }
+                     }
+
+                }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Erro na listagem", Toast.LENGTH_LONG).show()
+            }
     }
 
 }
