@@ -104,7 +104,6 @@ class GroupActivity : AppCompatActivity() {
                     if(isGroupMember){
                         binding.btAddParticipant.visibility = View.INVISIBLE
                         binding.btRegisterActivity.visibility = View.VISIBLE
-
                     }
                 }
             }
