@@ -2,24 +2,22 @@ package com.example.pm26sactivityapp
 
 import android.content.Context
 import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.opengl.Visibility
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import android.widget.Button
 import android.widget.Toast
 import androidx.constraintlayout.widget.Group
 import com.example.pm26sactivityapp.databinding.ActivityGroupBinding
-import com.example.pm26sactivityapp.databinding.ActivityListGoupBinding
 import com.example.pm26sactivityapp.services.CaptureMotion
+import com.example.pm26sactivityapp.services.UserInformation
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class GroupActivity : AppCompatActivity() {
     private lateinit var binding: ActivityGroupBinding
@@ -30,7 +28,9 @@ class GroupActivity : AppCompatActivity() {
     private lateinit var sensorManager: SensorManager
     private lateinit var accelerometer: Sensor
     private var isCapturing: Boolean = false
+    private var text: String = ""
     private var captureMotion: CaptureMotion = CaptureMotion()
+    private var userInformation: UserInformation = UserInformation()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,23 +53,23 @@ class GroupActivity : AppCompatActivity() {
             btOnClick()
         }
         userLoggedIsGroupParticipant()
+        loadHistorical()
 
         binding.btRegisterActivity.setOnClickListener{
             if(isCapturing){
-                isCapturing = captureMotion.stopCapture(sensorManager, this)
+                isCapturing = captureMotion.stopCapture(sensorManager, this, db, groupName)
+                binding.btRegisterActivity.text = "Iniciar Atividade"
+                loadHistorical()
             } else {
-                try{
-                    isCapturing = captureMotion.startCapture(sensorManager,accelerometer,this)
-                }catch (e: Exception){
-                    println(e.message)
-                }
+                isCapturing = captureMotion.startCapture(sensorManager,accelerometer,this)
+                binding.btRegisterActivity.text = "Parar Atividade"
             }
         }
     }
 
 
     fun btOnClick() {
-        val docRef = db.collection("users").document(userLogged())
+        val docRef = db.collection("users").document(userInformation.userLogged())
 
         docRef.get().addOnSuccessListener { document ->
             if (document != null) {
@@ -90,12 +90,8 @@ class GroupActivity : AppCompatActivity() {
         }
     }
 
-    fun userLogged(): String {
-        return "nH0PQ1fR8wg18MkkkWHF"
-    }
-
     fun userLoggedIsGroupParticipant() {
-        val docRef = db.collection("users").document(userLogged())
+        val docRef = db.collection("users").document(userInformation.userLogged())
 
         docRef.get().addOnSuccessListener { document ->
             if (document != null) {
@@ -114,5 +110,24 @@ class GroupActivity : AppCompatActivity() {
             }
         }.addOnFailureListener {
         }
+    }
+
+    private fun loadHistorical(){
+        val groupUserAverageMotion = db.collection("groupUserAverageMotion")
+        binding.viewTimes.text = ""
+        groupUserAverageMotion.whereEqualTo("groupName", groupName)
+            .get()
+            .addOnSuccessListener { result ->
+                for (document in result) {
+                    // Acesso aos dados do documento filtrado por nome
+                    val currentDate = document.get("currentDate")
+                    val averageMotion = document.getLong("averageMotion")
+
+                    text += "Data/Hora: ${currentDate} - Media de movimentaçãp: ${averageMotion} \n"
+                    binding.viewTimes.text = text
+                }
+            }
+            .addOnFailureListener { e ->
+            }
     }
 }
