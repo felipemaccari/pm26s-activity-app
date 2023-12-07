@@ -113,18 +113,19 @@ class GroupActivity : AppCompatActivity() {
 
     private fun loadHistorical(){
         val groupUserAverageMotion = db.collection("groupUserAverageMotion")
-        binding.viewTimes.text = ""
         groupUserAverageMotion.whereEqualTo("groupName", groupName)
             .get()
             .addOnSuccessListener { result ->
+                text = ""
                 for (document in result) {
                     // Acesso aos dados do documento filtrado por nome
                     val currentDate = document.get("currentDate")
                     val averageMotion = document.getLong("averageMotion")
 
                     text += "Data/Hora: ${currentDate} - Media de movimentaçãp: ${averageMotion} \n"
-                    binding.viewTimes.text = text
+
                 }
+                binding.viewTimes.text = text
             }
             .addOnFailureListener { e ->
             }
